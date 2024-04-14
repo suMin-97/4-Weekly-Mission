@@ -1,10 +1,10 @@
-import { axiosInstance, useAsync } from "@/src/sharing/util";
+import { publicAxios, useAsync } from "@/src/sharing/util";
 import { useCallback } from "react";
 
 export const useCheckEmailDuplicate = (email: string) => {
   const checkEmailDuplicate = useCallback(
     () =>
-      axiosInstance.post<{ data: { isUsableNickname: boolean } }>("check-email", {
+      publicAxios.post<{ data: { isUsableNickname: boolean } }>("check-email", {
         email,
       }),
     [email]

@@ -1,4 +1,4 @@
-import { axiosInstance, useAsync } from "@/src/sharing/util";
+import { publicAxios, useAsync } from "@/src/sharing/util";
 import { useCallback, useEffect } from "react";
 import { Token } from "../type";
 
@@ -7,7 +7,7 @@ type UseSignUpParams = { email: string; password: string };
 export const useSignUp = ({ email, password }: UseSignUpParams) => {
   const signUp = useCallback(
     () =>
-      axiosInstance.post<{ data: Token }>("sign-up", {
+      publicAxios.post<{ data: Token }>("sign-up", {
         email,
         password,
       }),
@@ -19,7 +19,11 @@ export const useSignUp = ({ email, password }: UseSignUpParams) => {
     if (data?.data.accessToken) {
       localStorage.setItem("accessToken", data.data.accessToken);
     }
-  }, [data?.data.accessToken]);
+
+    if (data?.data.refreshToken) {
+      localStorage.setItem("refreshToken", data?.data.refreshToken);
+    }
+  }, [data?.data.accessToken, data?.data.refreshToken]);
 
   return {
     execute,
