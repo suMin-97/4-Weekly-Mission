@@ -20,6 +20,18 @@ privateAxios.interceptors.request.use((config) => {
   return config;
 });
 
+const postRefreshToken = () => {
+  const response = publicAxios.post(
+    "refresh-token",
+    {
+      refresh_token: `${localStorage.getItem("refreshToken")}`,
+    },
+    { _retry: true }
+  );
+
+  return response;
+};
+
 privateAxios.interceptors.response.use(
   (response) => {
     return response;
@@ -27,13 +39,9 @@ privateAxios.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
-      await publicAxios.post(
-        "refresh-token",
-        { refreshToken: `${window?.localStorage.getItem("refreshToken")}` },
-        {
-          _retry: true,
-        }
-      );
+      const newToken = await postRefreshToken();
+      localStorage.setItem("accessToken", newToken?.data.data.accessToken);
+      localStorage.setItem("refreshToken", newToken?.data.data.refreshToken);
       originalRequest._retry = true;
       return privateAxios(originalRequest);
     }
